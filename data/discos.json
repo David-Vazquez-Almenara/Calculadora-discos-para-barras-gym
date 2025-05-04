@@ -1,0 +1,27 @@
+[
+    {
+      "peso": 20,
+      "imagen": "src/img/discos/reales/disco-20kg.png"
+    },
+    {
+      "peso": 15,
+      "imagen": "src/img/discos/reales/disco-15kg.png"
+    },
+    {
+      "peso": 10,
+      "imagen": "src/img/discos/reales/disco-10kg.png"
+    },
+    {
+      "peso": 5,
+      "imagen": "src/img/discos/reales/disco-5kg.png"
+    },
+    {
+      "peso": 2.5,
+      "imagen": "src/img/discos/reales/disco-2.5kg.png"
+    },
+    {
+      "peso": 1.25,
+      "imagen": "src/img/discos/reales/disco-1.25kg.png"
+    }
+  ]
+  
