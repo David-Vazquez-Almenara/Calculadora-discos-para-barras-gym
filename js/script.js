@@ -134,8 +134,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function mostrarResultado(discos) {
-        discosDiv.innerHTML = "";
+        const resultadoDiv = document.getElementById("NumeroDiscosResult");
+        resultadoDiv.innerHTML = "Discos necesarios: " + discos.length;
 
+        discosDiv.innerHTML = "";
+        
         if (discos.length === 0) {
             discosDiv.innerHTML =
                 "<p>No se pudo alcanzar el peso con los discos disponibles.</p>";
