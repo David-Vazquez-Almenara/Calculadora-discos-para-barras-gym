@@ -6,7 +6,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const discosDiv = document.getElementById("discos");
     const errorMensaje = document.getElementById("errorMensaje");
 
+    const btnDisponibilidad = document.getElementById("btn-disponibilidad");
+    const dialogo = document.getElementById("dialogo-disponibilidad");
+    const cerrarDialogo = document.getElementById("btn-cerrar-dialogo");
+    const listaDisponibilidad = document.getElementById("lista-disponibilidad");
+    const contadorDeseleccionados = document.getElementById("contador-deseleccionados");
+
     let discosDisponibles = [];
+    let discosNoDisponibles = JSON.parse(localStorage.getItem("discosNoDisponibles")) || [];
 
     fetch("data/discos.json")
         .then((res) => res.json())
@@ -24,11 +31,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const totalValido = total !== "" && !isNaN(totalNum) && totalNum > 0;
         const barraValido = barra !== "" && !isNaN(barraNum) && barraNum >= 0;
 
-
-        // Condición de error: barra mayor que total
         const barraMayor = totalValido && barraValido && barraNum > totalNum;
 
-        // Mostrar error solo si están ambos campos llenos y la barra pesa más
         if (barraMayor) {
             errorMensaje.textContent =
                 "El peso de la barra no puede ser mayor al peso objetivo.";
@@ -36,17 +40,12 @@ document.addEventListener("DOMContentLoaded", () => {
             errorMensaje.textContent = "";
         }
 
-        // Aplicar clase de error solo si se cumple la condición
         pesoTotalInput.classList.toggle("input-error", barraMayor);
         pesoBarraInput.classList.toggle("input-error", barraMayor);
 
-        // Desactivar botón si no es válido o hay campos vacíos
         const sonValidos = totalValido && barraValido && !barraMayor;
         btnCalcular.disabled = !sonValidos;
     }
-
-
-
 
     pesoTotalInput.addEventListener("input", validarCampos);
     pesoBarraInput.addEventListener("input", validarCampos);
@@ -72,7 +71,9 @@ document.addEventListener("DOMContentLoaded", () => {
         let restante = pesoObjetivo;
         const usados = [];
 
-        for (let disco of discosDisponibles) {
+        const disponiblesFiltrados = discosDisponibles.filter(d => !discosNoDisponibles.includes(d.peso));
+
+        for (let disco of disponiblesFiltrados) {
             let cantidad = Math.floor(restante / disco.peso);
             if (cantidad > 0) {
                 usados.push({ ...disco, cantidad });
@@ -97,73 +98,94 @@ document.addEventListener("DOMContentLoaded", () => {
             const item = document.createElement("div");
             item.className = "disco-item";
             item.innerHTML = `
-          <img src="${disco.imagen}" alt="Disco ${disco.peso}kg" />
-          <div class="disco-texto">${disco.cantidad} x ${disco.peso}kg</div>
-        `;
+              <img src="${disco.imagen}" alt="Disco ${disco.peso}kg" />
+              <div class="disco-texto">${disco.cantidad} x ${disco.peso}kg</div>
+            `;
             discosDiv.appendChild(item);
         });
     }
 
 
 
-    //#######################################
-    // Dialog de discos no disponibles
-    //#######################################
 
-    const btnDisponibilidad = document.getElementById("btn-disponibilidad");
-    const dialogo = document.getElementById("dialogo-disponibilidad");
-    const cerrarDialogo = document.getElementById("btn-cerrar-dialogo");
-    const listaDisponibilidad = document.getElementById("lista-disponibilidad");
-    const contadorDeseleccionados = document.getElementById("contador-deseleccionados");
 
-    let discosNoDisponibles = JSON.parse(localStorage.getItem("discosNoDisponibles")) || [];
 
-    function actualizarContador() {
-        contadorDeseleccionados.textContent = discosNoDisponibles.length;
+    //##################################
+    // Dialogo de disponibilidad de discos
+    //##################################    
+
+
+function actualizarContador() {
+    contadorDeseleccionados.textContent = discosNoDisponibles.length;
+}
+
+function toggleDiscoSeleccionado(peso) {
+    if (discosNoDisponibles.includes(peso)) {
+        // Si ya está desactivado, lo quitamos
+        discosNoDisponibles = discosNoDisponibles.filter(d => d !== peso);
+    } else {
+        // Lo añadimos a la lista de desactivados
+        discosNoDisponibles.push(peso);
     }
 
-    function toggleDiscoSeleccionado(peso) {
-        if (discosNoDisponibles.includes(peso)) {
-            discosNoDisponibles = discosNoDisponibles.filter(d => d !== peso);
-        } else {
-            discosNoDisponibles.push(peso);
-        }
-        localStorage.setItem("discosNoDisponibles", JSON.stringify(discosNoDisponibles));
-        renderizarDiscosDisponibilidad();
-        actualizarContador();
-    }
+    // Guardar en localStorage
+    localStorage.setItem("discosNoDisponibles", JSON.stringify(discosNoDisponibles));
 
-    function renderizarDiscosDisponibilidad() {
-        listaDisponibilidad.innerHTML = "";
-        discos.sort((a, b) => b.peso - a.peso).forEach(disco => {
-            const discoDiv = document.createElement("div");
-            discoDiv.classList.add("disco-item");
-            if (discosNoDisponibles.includes(disco.peso)) {
-                discoDiv.classList.add("disco-deseleccionado");
-            }
-
-            discoDiv.innerHTML = `
-      <img src="${disco.imagen}" alt="Disco ${disco.peso}kg">
-      <div class="disco-texto">${disco.peso}kg</div>
-    `;
-            discoDiv.addEventListener("click", () => toggleDiscoSeleccionado(disco.peso));
-            listaDisponibilidad.appendChild(discoDiv);
-        });
-    }
-
-    // Mostrar diálogo
-    btnDisponibilidad.addEventListener("click", () => {
-        dialogo.classList.remove("oculto");
-        renderizarDiscosDisponibilidad();
-    });
-
-    // Cerrar diálogo
-    cerrarDialogo.addEventListener("click", () => {
-        dialogo.classList.add("oculto");
-    });
-
-    // Inicializar contador
+    // Actualizar UI
+    renderizarDiscosDisponibilidad();
     actualizarContador();
+}
 
 
+function renderizarDiscosDisponibilidad() {
+    listaDisponibilidad.innerHTML = "";
+
+    discosDisponibles.forEach(disco => {
+        const discoDiv = document.createElement("div");
+        discoDiv.classList.add("disco-item");
+
+        // Si este disco está en la lista de NO disponibles, aplicar estilo
+        if (discosNoDisponibles.includes(disco.peso)) {
+            discoDiv.classList.add("disco-deseleccionado");
+        }
+
+        discoDiv.innerHTML = `
+            <img src="${disco.imagen}" alt="Disco ${disco.peso}kg">
+            <div class="disco-texto">${disco.peso}kg</div>
+        `;
+
+        discoDiv.addEventListener("click", () => {
+            toggleDiscoSeleccionado(disco.peso);
+        });
+
+        listaDisponibilidad.appendChild(discoDiv);
+    });
+}
+
+
+btnDisponibilidad.addEventListener("click", (e) => {
+    e.preventDefault();
+    dialogo.classList.remove("oculto");
+    renderizarDiscosDisponibilidad();
+});
+
+cerrarDialogo.addEventListener("click", () => {
+    dialogo.classList.add("oculto");
+});
+
+dialogo.addEventListener("click", (e) => {
+    if (e.target === dialogo) {
+      dialogo.classList.add("oculto");
+    }
+  });
+  
+  // Botón "X"
+  cerrarDialogo.addEventListener("click", () => {
+    dialogo.classList.add("oculto");
+  });
+
+
+
+
+    actualizarContador();
 });
