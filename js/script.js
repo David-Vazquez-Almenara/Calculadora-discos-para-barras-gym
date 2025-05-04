@@ -224,11 +224,6 @@ cerrarDialogo.addEventListener("click", () => {
     dialogo.classList.add("oculto");
 });
 
-dialogo.addEventListener("click", (e) => {
-    if (e.target === dialogo) {
-      dialogo.classList.add("oculto");
-    }
-  });
   
   // Botón "X"
   cerrarDialogo.addEventListener("click", () => {
