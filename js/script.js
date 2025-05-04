@@ -6,6 +6,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const discosDiv = document.getElementById("discos");
     const errorMensaje = document.getElementById("errorMensaje");
 
+    let deferredPrompt;
+    const btnInstalar = document.getElementById("btn-instalar");
+
+
     const btnDisponibilidad = document.getElementById("btn-disponibilidad");
     const dialogo = document.getElementById("dialogo-disponibilidad");
     const cerrarDialogo = document.getElementById("btn-cerrar-dialogo");
@@ -14,6 +18,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let discosDisponibles = [];
     let discosNoDisponibles = JSON.parse(localStorage.getItem("discosNoDisponibles")) || [];
+
+
+
+    
+    //##################################
+    // Descargar la app
+    //##################################    
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+        // Previene que el navegador muestre el banner automático
+        e.preventDefault();
+        deferredPrompt = e;
+      
+        // Mostrar el botón personalizado
+        btnInstalar.classList.remove("oculto");
+      
+        // Al hacer clic, mostrar el prompt de instalación
+        btnInstalar.addEventListener("click", () => {
+          btnInstalar.classList.add("oculto");
+      
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+      
+            deferredPrompt.userChoice.then((choiceResult) => {
+              if (choiceResult.outcome === "accepted") {
+                console.log("El usuario instaló la app");
+              } else {
+                console.log("El usuario canceló la instalación");
+              }
+              deferredPrompt = null;
+            });
+          }
+        });
+      });
+
+
+
+
+      
+    //##################################
+    // Calcular discos
+    //##################################    
+
+
 
     fetch("data/discos.json")
         .then((res) => res.json())
