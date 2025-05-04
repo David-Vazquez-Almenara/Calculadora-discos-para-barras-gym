@@ -2,10 +2,27 @@
 <html lang="es">
 
 <head>
+    <!-- Favicon general -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png" />
+
+    <!-- Icono iOS -->
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+
+    <!-- Manifest PWA -->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#fae653" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+
+
+
+
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CargaTuBarra</title>
-    <icon rel="shortcut icon" href="src/img/logo/CargaTuBarra.ico"/>
     <link rel="stylesheet" href="css/style.css" />
 </head>
 
@@ -34,9 +51,9 @@
                 <div class="dialogo-contenido">
                     <h2>Selecciona los discos que NO tienes</h2>
                     <div id="lista-disponibilidad" class="grid-disponibilidad"></div>
-                   
+
                     <center>
-                    <button id="btn-cerrar-dialogo" class="btn-cerrar-x" title="Cerrar">Cerrar</button>
+                        <button id="btn-cerrar-dialogo" class="btn-cerrar-x" title="Cerrar">Cerrar</button>
                     </center>
                 </div>
             </div>
